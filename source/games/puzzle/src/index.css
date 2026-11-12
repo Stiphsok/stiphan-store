@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Cairo', 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    background-color: #0d1b2a;
+    color: #ffffff;
+    overscroll-behavior: none;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1b2a;
+}
+::-webkit-scrollbar-thumb {
+  background: #415a77;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #fca311;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(252, 163, 17, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(252, 163, 17, 0.8);
+  }
+}
+
+.glow-amber {
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes coinPop {
+  0% { transform: scale(0.8) translateY(10px); opacity: 0; }
+  50% { transform: scale(1.15) translateY(-5px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.animate-coin-pop {
+  animation: coinPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Moroccan geometric background subtle pattern */
+.bg-moroccan-pattern {
+  background-color: #0d1b2a;
+  background-image: radial-gradient(#1b263b 1px, transparent 1px), radial-gradient(#1b263b 1px, #0d1b2a 1px);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+}

@@ -1,0 +1,1 @@
+export function clsx(...args){ const out=[]; const walk=x=>{ if(!x) return; if(typeof x==='string'||typeof x==='number'){out.push(String(x));return;} if(Array.isArray(x)){x.forEach(walk);return;} if(typeof x==='object'){for(const k in x) if(x[k]) out.push(k);} }; args.forEach(walk); return out.join(' '); }

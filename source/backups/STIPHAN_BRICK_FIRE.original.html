@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#050713">
+<title>STIPHAN BRICK FIRE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#02030a;color:#fff;font-family:Segoe UI,Arial,sans-serif;touch-action:none}
+body{overscroll-behavior:none}
+canvas{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:none}
+button{font:inherit;-webkit-tap-highlight-color:transparent}
+#hud-top{position:fixed;top:max(10px,env(safe-area-inset-top));left:8px;right:8px;z-index:10;display:grid;grid-template-columns:repeat(3,1fr) auto;gap:5px;pointer-events:none}
+.panel-box{min-width:0;background:rgba(9,10,24,.84);border:1px solid rgba(255,255,255,.22);border-radius:11px;padding:7px 5px;font-size:11px;font-weight:800;color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.45);text-align:center;text-shadow:0 1px 2px #000;white-space:nowrap}
+.panel-box span{color:#ffe66d}
+#pause-btn,#shop-btn{pointer-events:auto;border:1px solid rgba(255,255,255,.35);border-radius:11px;background:rgba(10,12,30,.9);color:#fff;cursor:pointer;box-shadow:0 5px 18px rgba(0,0,0,.45)}
+#pause-btn{position:fixed;left:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:12;width:44px;height:42px;font-size:18px}
+#shop-btn{position:fixed;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:12;padding:8px 11px;font-size:11px;font-weight:900}
+#theme-banner{position:fixed;top:62px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:9;opacity:0;pointer-events:none;padding:7px 13px;border-radius:999px;background:rgba(5,6,18,.84);border:1px solid rgba(255,255,255,.28);font-size:12px;font-weight:900;letter-spacing:.7px;white-space:nowrap;box-shadow:0 0 22px rgba(255,255,255,.14);transition:opacity .22s,transform .22s}
+#theme-banner.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#speed-footer{position:fixed;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:6px;background:rgba(7,8,20,.82);border:1px solid rgba(255,255,255,.22);border-radius:15px;padding:5px 8px;box-shadow:0 7px 22px rgba(0,0,0,.5);pointer-events:auto}
+.speed-btn{width:29px;height:29px;border:1px solid rgba(255,255,255,.25);border-radius:8px;background:rgba(255,255,255,.08);color:#fff;font-size:17px;font-weight:900;cursor:pointer}
+#speed-bar-container{width:62px;height:7px;background:#111525;border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,.16)}
+#speed-fill{width:23%;height:100%;background:linear-gradient(90deg,#ff7a18,#ffe45c)}
+#speed-text{font-size:11px;color:#ffe45c;min-width:32px;text-align:center;font-weight:800}
+#overlay,.modal-layer{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(2,3,12,.84);backdrop-filter:blur(5px)}
+.modal-card{width:min(92%,390px);max-height:86vh;overflow:auto;padding:26px 20px;text-align:center;background:linear-gradient(145deg,#14162c,#080914);border:2px solid rgba(255,230,92,.75);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.85),0 0 35px rgba(255,100,30,.12)}
+.modal-card h1{font-size:25px;color:#ffe66d;text-shadow:0 0 16px #ff641f;margin-bottom:9px}
+.modal-card p{color:#cbd5e1;font-size:13px;line-height:1.45;margin-bottom:18px}
+.primary-btn{border:1px solid #fff0a3;border-radius:13px;padding:13px 27px;color:#fff;background:linear-gradient(135deg,#ff6a00,#b52f00);font-size:15px;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(255,106,0,.35)}
+.hidden{display:none!important}
+.shop-title{font-size:21px!important}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 14px}
+.shop-item{padding:10px 7px;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.045)}
+.shop-item strong{display:block;font-size:18px;margin-bottom:3px}
+.shop-item small{display:block;color:#cbd5e1;margin-bottom:7px}
+.buy-btn{width:100%;padding:7px;border:1px solid rgba(255,255,255,.28);border-radius:9px;background:#161a31;color:#fff;font-weight:800;cursor:pointer}
+.buy-btn:disabled{opacity:.45}
+.close-btn{border:0;background:transparent;color:#cbd5e1;padding:8px 15px;cursor:pointer}
+#shop-balance{color:#ffe66d;font-weight:900;margin-bottom:3px}
+@media (min-width:500px){#hud-top{left:12px;right:12px;max-width:600px;margin:auto}.panel-box{font-size:12px}}
+
+#language-select{margin:0 0 15px}
+.lang-title{font-size:11px;font-weight:900;color:#ffe66d;margin-bottom:8px;letter-spacing:.4px}
+.lang-buttons{display:flex;gap:7px;justify-content:center}
+.lang-btn{border:1px solid rgba(255,255,255,.25);border-radius:9px;padding:8px 10px;background:#111525;color:#fff;font-size:11px;font-weight:800;cursor:pointer}
+.lang-btn.active{border-color:#ffe66d;background:#3a2410;color:#ffe66d}
+
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+
+<div id="hud-top">
+  <div class="panel-box">👑 LEVEL <span id="lvl-val">1</span></div>
+  <div class="panel-box">🏆 SCORE <span id="score-val">0</span></div>
+  <div class="panel-box">🪙 <span id="coins-val">0</span></div>
+  <div class="panel-box" id="lives-box">❤️ <span id="lives-val">3</span></div>
+  <button id="pause-btn" aria-label="Pause">⏸</button>
+</div>
+
+<div id="theme-banner">FRUIT FIRE • LEVEL 1</div>
+
+<div id="speed-footer">
+  <span style="font-size:10px;color:#ffe66d;font-weight:900">SPEED</span>
+  <button class="speed-btn" id="sub-speed" aria-label="Decrease speed">-</button>
+  <div id="speed-bar-container"><div id="speed-fill"></div></div>
+  <button class="speed-btn" id="add-speed" aria-label="Increase speed">+</button>
+
+  <span id="speed-text">1.0x</span>
+</div>
+<button id="shop-btn">🛒 SHOP</button>
+
+<div id="overlay">
+  <div class="modal-card">
+    <h1 id="overlay-title">STIPHAN BRICK FIRE</h1>
+    <p id="overlay-text">Move the paddle with your finger anywhere on the game area. Break every brick and advance through themed levels. Earn virtual coins only by completing levels.</p>
+    
+<div id="language-select" class="language-select">
+  <div class="lang-title">LANGUAGE / LANGUE / اللغة</div>
+  <div class="lang-buttons">
+    <button class="lang-btn active" data-lang="en">English</button>
+    <button class="lang-btn" data-lang="fr">Français</button>
+    <button class="lang-btn" data-lang="ar">العربية</button>
+  </div>
+</div>
+<button class="primary-btn" id="start-btn">PLAY &amp; WIN</button>
+  </div>
+</div>
+
+<div id="shop-modal" class="modal-layer hidden">
+  <div class="modal-card">
+    <h1 class="shop-title">🛒 STIPHAN SHOP</h1>
+    <div id="shop-balance">🪙 0</div>
+    <p>Coins are virtual in-game currency. They are saved on this device and are never removed by losing a life or restarting.</p>
+    <div class="shop-grid">
+      <div class="shop-item"><strong>🛡️</strong><small>+1 Life</small><button class="buy-btn" data-cost="30" data-item="life">🪙 30</button></div>
+      <div class="shop-item"><strong>↔️</strong><small>Wide Paddle</small><button class="buy-btn" data-cost="40" data-item="paddle">🪙 40</button></div>
+      <div class="shop-item"><strong>🔥</strong><small>Fire Ball • 2× damage</small><button class="buy-btn" data-cost="50" data-item="fire">🪙 50</button></div>
+      <div class="shop-item"><strong>💎</strong><small>Score Boost</small><button class="buy-btn" data-cost="60" data-item="score">🪙 60</button></div>
+    </div>
+    <button class="close-btn" id="close-shop">CLOSE</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const canvas=document.getElementById("gameCanvas");
+const ctx=canvas.getContext("2d",{alpha:false});
+
+let W=0,H=0,dpr=1;
+let running=false,paused=false,score=0,level=1,lives=3,combo=0;
+let coins=Math.max(0,Number(localStorage.getItem("stiphans_coins")||0));
+let bestScore=Number(localStorage.getItem("stiphans_best_score")||0);
+let bestCombo=Number(localStorage.getItem("stiphans_best_combo")||0);
+let speedMultiplier=1.0;
+let startSpeed=1.0;
+let paddle={x:0,y:0,w:140,h:18};
+let balls=[],bricks=[],lastTime=0;
+let draggingPaddle=false;
+let touchTargetX=null;
+let scoreBoost=1;
+let levelTransitioning=false;
+let fireStart=false;
+let themeBannerTimer=0;
+
+const themes=[
+
+ {name:"FRUIT FIRE",icons:["🍓","🍉","🍊","🍋","🍇","🥝","🍒","🍌"],ball:"🍓",bg1:"#102b25",bg2:"#661b25",colors:["#ef3340","#ff8c00","#ffd43b","#8fce00","#a855f7"]},
+ {name:"FOOTBALL",icons:["⚽","🥅","🏆","👟","🧤","🟩","🟥","🟨"],ball:"⚽",bg1:"#061b12",bg2:"#0b5d35",colors:["#16a34a","#22c55e","#84cc16","#facc15","#f8fafc"]},
+ {name:"STAR ARENA",icons:["⭐","🌟","💫","✨","🌠","💜","💎","👑"],ball:"⭐",bg1:"#19104a",bg2:"#72146d",colors:["#7c3dfd","#c026d3","#ec4899","#6366f1","#f472b6"]},
+ {name:"ARCADE NIGHT",icons:["🎮","🕹️","👾","💎","⚡","🔥","🎯","🪙"],ball:"🎮",bg1:"#041c2e",bg2:"#17366e",colors:["#00e5ff","#18ff78","#ff2bd6","#7c4dff","#ffe600"]},
+ {name:"COSMIC",icons:["🌌","🪐","🌙","☄️","🔮","💠","🚀","⭐"],ball:"🪐",bg1:"#070b2e",bg2:"#38106d",colors:["#2563eb","#7c3dfd","#06b6d4","#9333ea","#a855f7"]},
+ {name:"NEON FIRE",icons:["💥","⚡","🎯","🔶","🔷","💎","🔥","✨"],ball:"⚡",bg1:"#26070a",bg2:"#7a1b0b",colors:["#ff1744","#ff6d00","#ffe600","#00e5ff","#d500f9"]},
+ {name:"CYBER RUSH",icons:["🤖","🧬","🛰️","🔋","⚙️","💿","🔺","🔻"],ball:"🔋",bg1:"#061a1c",bg2:"#183d38",colors:["#00ffc8","#00a8ff","#d8ff00","#ff4dcb","#7cff00"]},
+ {name:"MAGIC STORM",icons:["🌀","🧙","🪄","♓","🌪️","☄️","🦄","💜"],ball:"🌀",bg1:"#18082e",bg2:"#4b145f",colors:["#8b5cf6","#ec4899","#22d3ee","#f59e0b","#a3e635"]},
+ {name:"OCEAN BLAZE",icons:["🌊","🐠","🐙","🐳","🫧","🐚","⚓","💧"],ball:"🌊",bg1:"#03233b",bg2:"#075985",colors:["#0284c7","#06b6d4","#14b8a6","#38bdf8","#0ea5e9"]},
+ {name:"VOLCANO",icons:["🌋","🔥","🌡️","💥","🪨","🌑","☄️","♨️"],ball:"🔥",bg1:"#240706",bg2:"#7f1d1d",colors:["#ef4444","#f97316","#f59e0b","#dc2626","#facc15"]},
+ {name:"DESERT TEMPLE",icons:["🏜️","🗿","🐍","☀️","🏺","🔱","💎","🦂"],ball:"☀️",bg1:"#291405",bg2:"#8a4b08",colors:["#f59e0b","#eab308","#d97706","#fbbf24","#fde68a"]},
+ {name:"EMERALD TEMPLE",icons:["💚","🗿","🌿","💎","🔱","🪙","🧿","✨"],ball:"💚",bg1:"#031b13",bg2:"#075e45",colors:["#10b981","#22c55e","#84cc16","#14b8a6","#34d399"]},
+ {name:"CYBER CITY",icons:["🏙️","🤖","🚦","💾","⚡","📡","🔷","🛰️"],ball:"⚡",bg1:"#020617",bg2:"#172554",colors:["#06b6d4","#3b82f6","#8b5cf6","#22d3ee","#38bdf8"]},
+ {name:"GALAXY",icons:["🌌","⭐","🪐","🌙","☄️","🚀","👽","💫"],ball:"🌟",bg1:"#030014",bg2:"#31135e",colors:["#6366f1","#8b5cf6","#a855f7","#ec4899","#22d3ee"]},
+ {name:"SPACE WAR",icons:["🚀","👽","🛸","💥","🔫","🪐","☄️","⚡"],ball:"🚀",bg1:"#030712",bg2:"#172554",colors:["#22d3ee","#3b82f6","#6366f1","#ef4444","#f97316"]},
+ {name:"DEEP OCEAN",icons:["🌊","🐋","🦈","🐙","🐠","🪼","🐚","⚓"],ball:"🐋",bg1:"#02131f",bg2:"#064e6e",colors:["#0284c7","#06b6d4","#0ea5e9","#14b8a6","#38bdf8"]},
+ {name:"PIRATE ISLAND",icons:["🏴‍☠️","☠️","🦜","⚓","💰","🗺️","🪙","🏝️"],ball:"☠️",bg1:"#160b05",bg2:"#5b2c06",colors:["#f59e0b","#d97706","#92400e","#facc15","#38bdf8"]},
+ {name:"MAGIC KINGDOM",icons:["🏰","🪄","🧙","🐉","✨","🔮","🦄","👑"],ball:"🔮",bg1:"#12052b",bg2:"#4c1d95",colors:["#8b5cf6","#a855f7","#ec4899","#22d3ee","#facc15"]},
+ {name:"DRAGON REALM",icons:["🐉","🔥","⚔️","🛡️","💎","🏰","🪽","🌋"],ball:"🐉",bg1:"#160707",bg2:"#58151a",colors:["#dc2626","#f97316","#facc15","#7c3aed","#22c55e"]},
+ {name:"ICE KINGDOM",icons:["❄️","⛄","🧊","🏰","💎","🐺","🌨️","👑"],ball:"❄️",bg1:"#031522",bg2:"#164e63",colors:["#38bdf8","#67e8f9","#a5f3fc","#818cf8","#e0f2fe"]},
+ {name:"MYSTIC FOREST",icons:["🌲","🍄","🦉","🦊","🌿","🧚","🌙","✨"],ball:"🍄",bg1:"#03140b",bg2:"#14532d",colors:["#16a34a","#22c55e","#84cc16","#a3e635","#f59e0b"]},
+ {name:"THUNDER ARENA",icons:["⚡","🌩️","🔥","💥","🎯","🔷","💎","🌪️"],ball:"⚡",bg1:"#07101f",bg2:"#172554",colors:["#facc15","#38bdf8","#6366f1","#a855f7","#f8fafc"]},
+ {name:"INFERNO",icons:["🔥","💥","🌋","😈","☄️","🔱","💀","⚔️"],ball:"🔥",bg1:"#1a0303",bg2:"#7f1d1d",colors:["#dc2626","#ef4444","#f97316","#facc15","#991b1b"]},
+ {name:"TOXIC LAB",icons:["☢️","🧪","🧬","☣️","🧫","🔋","👾","💚"],ball:"☢️",bg1:"#061006",bg2:"#164e21",colors:["#84cc16","#22c55e","#a3e635","#eab308","#14b8a6"]},
+ {name:"NEON RACING",icons:["🏎️","🏁","⚡","🔥","🛞","🚦","💨","🏆"],ball:"🏎️",bg1:"#090914",bg2:"#312e81",colors:["#ec4899","#22d3ee","#a855f7","#f97316","#facc15"]},
+ {name:"NINJA DOJO",icons:["🥷","⚔️","🗡️","🎯","🔥","🌑","🐉","💨"],ball:"🥷",bg1:"#050505",bg2:"#27272a",colors:["#ef4444","#f97316","#facc15","#a855f7","#22c55e"]},
+ {name:"DARK CASTLE",icons:["🏰","🦇","💀","🕯️","🗝️","🛡️","⚔️","🌑"],ball:"🦇",bg1:"#08060f",bg2:"#27213f",colors:["#7c3aed","#a855f7","#ef4444","#64748b","#c084fc"]},
+ {name:"ANCIENT EGYPT",icons:["𓂀","🐍","☀️","🦂","🏺","🗿","💎","👑"],ball:"☀️",bg1:"#211302",bg2:"#713f12",colors:["#f59e0b","#eab308","#d97706","#14b8a6","#22d3ee"]},
+ {name:"WARRIOR ARENA",icons:["⚔️","🛡️","🏆","💥","🔥","🪓","🏹","👑"],ball:"⚔️",bg1:"#100b08",bg2:"#4a2514",colors:["#ef4444","#f97316","#eab308","#94a3b8","#7c3aed"]},
+ {name:"ALIEN PLANET",icons:["👽","🛸","🪐","🧬","☄️","🔮","🌌","🤖"],ball:"👽",bg1:"#04100d",bg2:"#164e63",colors:["#22c55e","#14b8a6","#06b6d4","#a3e635","#8b5cf6"]},
+];
+let currentTheme=themes[0];
+
+let audioCtx=null;
+function playSound(freq,duration,type="sine"){
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();
+    osc.frequency.value=freq;osc.type=type;
+    gain.gain.setValueAtTime(.06,audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);
+    osc.connect(gain);gain.connect(audioCtx.destination);
+    osc.start();osc.stop(audioCtx.currentTime+duration);
+  }catch(e){}
+}
+function playWinSound(){
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    const now=audioCtx.currentTime;
+    [523.25,659.25,783.99,1046.5].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(),g=audioCtx.createGain(),s=now+i*.09;
+      o.frequency.value=f;o.type="triangle";
+      g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.1,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+.2);
+      o.connect(g);g.connect(audioCtx.destination);o.start(s);o.stop(s+.22);
+    });
+  }catch(e){}
+}
+
+function playCoinSound(){
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended")audioCtx.resume();
+    const now=audioCtx.currentTime;
+    [987.77,1318.51].forEach((freq,i)=>{
+      const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),t=now+i*.075;
+      osc.type="square";osc.frequency.setValueAtTime(freq,t);
+      gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.13,t+.008);gain.gain.exponentialRampToValueAtTime(.0001,t+.085);
+      osc.connect(gain);gain.connect(audioCtx.destination);osc.start(t);osc.stop(t+.095);
+    });
+  }catch(e){}
+}
+function saveCoins(){localStorage.setItem("stiphans_coins",String(Math.max(0,Math.floor(coins))));}
+function resize(){
+  W=window.innerWidth;H=window.innerHeight;dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.max(1,Math.floor(W*dpr));canvas.height=Math.max(1,Math.floor(H*dpr));
+  canvas.style.width=W+"px";canvas.style.height=H+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  paddle.y=H-Math.max(88,Math.min(120,H*.14));
+  paddle.w=Math.max(112,Math.min(170,W*.32));
+  paddle.x=Math.max(paddle.w/2,Math.min(W-paddle.w/2,paddle.x||W/2));
+}
+window.addEventListener("resize",resize,{passive:true});
+resize();
+
+function themeIndex(){return(level-1)%themes.length}
+function updateTheme(){
+  currentTheme=themes[themeIndex()];
+  showThemeBanner();
+}
+function showThemeBanner(){
+  const el=document.getElementById("theme-banner");
+  el.textContent=currentTheme.name+" • LEVEL "+level;
+  el.classList.add("show");
+  clearTimeout(themeBannerTimer);
+  themeBannerTimer=setTimeout(()=>el.classList.remove("show"),1800);
+}
+function currentBallSpeed(){
+  return 520*speedMultiplier;
+}
+function brickRows(){return Math.min(11,5+Math.floor((level-1)/2))}
+function brickHP(r,c){
+  if(level<3)return 1;
+  if(level<6)return((r+c)%5===0)?2:1;
+  if(level<10)return((r+c)%4===0)?2:1;
+  return((r+c)%6===0)?3:((r+c)%3===0?2:1);
+}
+function initGame(){
+  score=0;level=1;lives=3;combo=0;speedMultiplier=startSpeed;scoreBoost=1;fireStart=false;levelTransitioning=false;
+  paddle.w=Math.max(112,Math.min(170,W*.32)*(1-Math.min(0.25,(level-1)*0.018)));paddle.x=W/2;
+  updateTheme();createBricks();resetBall();updateUI();
+  running=true;paused=false;lastTime=performance.now();
+  document.getElementById("overlay").classList.add("hidden");
+  playSound(440,.1);
+}
+function resetBall(){
+
+  const s=currentBallSpeed(),angle=-(Math.PI*.35);
+  balls=[{x:paddle.x,y:paddle.y-18,vx:Math.sin(angle)*s,vy:-Math.cos(angle)*s,r:10,trail:[]}];
+}
+function createBricks(){
+  bricks=[];
+  const cols=Math.min(9,Math.max(7,Math.floor(W/48)));
+  const gap=5,side=9,bw=(W-side*2-gap*(cols-1))/cols,rows=brickRows();
+  const top=Math.max(88,H*.11);
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    let pattern=true;
+    if(level%3===0)pattern=((r+c)%5!==0||r<2);
+    if(level%4===0)pattern=((c%2===0)||(r===0)||(r===rows-1));
+    if(!pattern)continue;
+    bricks.push({
+      x:side+c*(bw+gap),y:top+r*30,w:bw,h:24,
+      hp:brickHP(r,c),maxHp:brickHP(r,c),
+      item:currentTheme.icons[(r*cols+c+level)%currentTheme.icons.length],
+      color:currentTheme.colors[(r+c+level)%currentTheme.colors.length]
+    });
+  }
+}
+function update(dt){
+  if(!running||paused)return;
+  const currentSpd=currentBallSpeed();
+
+  for(const b of balls){
+    const mag=Math.hypot(b.vx,b.vy)||1;
+    b.vx=b.vx/mag*currentSpd;b.vy=b.vy/mag*currentSpd;
+    b.trail.push({x:b.x,y:b.y});
+    if(b.trail.length>6)b.trail.shift();
+    b.x+=b.vx*dt;b.y+=b.vy*dt;
+
+    if(b.x-b.r<=0){b.x=b.r;b.vx=Math.abs(b.vx);playSound(150,.035)}
+    if(b.x+b.r>=W){b.x=W-b.r;b.vx=-Math.abs(b.vx);playSound(150,.035)}
+    if(b.y-b.r<=0){b.y=b.r;b.vy=Math.abs(b.vy);playSound(150,.035)}
+
+    const pr={x:paddle.x-paddle.w/2,y:paddle.y,w:paddle.w,h:paddle.h};
+    if(b.vy>0&&b.x>=pr.x&&b.x<=pr.x+pr.w&&b.y+b.r>=pr.y&&b.y-b.r<=pr.y+pr.h){
+      b.y=pr.y-b.r;
+      const hit=Math.max(-.9,Math.min(.9,(b.x-paddle.x)/(paddle.w/2)));
+      const angle=hit*1.12;
+      b.vx=Math.sin(angle)*currentSpd;b.vy=-Math.cos(angle)*currentSpd;
+      combo=0;playSound(300,.045);
+    }
+
+    for(let i=bricks.length-1;i>=0;i--){
+      const br=bricks[i];
+      if(b.x+b.r<br.x||b.x-b.r>br.x+br.w||b.y+b.r<br.y||b.y-b.r>br.y+br.h)continue;
+      const prevX=b.x-b.vx*dt,prevY=b.y-b.vy*dt;
+      if(prevY<=br.y||prevY>=br.y+br.h)b.vy*=-1;else b.vx*=-1;
+      const damage=fireStart?2:1;
+      br.hp-=damage;combo++;
+      score+=Math.round(20*combo*scoreBoost);
+      if(combo>bestCombo){bestCombo=combo;localStorage.setItem("stiphans_best_combo",bestCombo)}
+      if(br.hp<=0){
+        bricks.splice(i,1);score+=Math.round(20*level*scoreBoost);
+        playSound(500+combo*9,.065,"square");
+      }else playSound(380+combo*7,.04);
+      if(score>bestScore){bestScore=score;localStorage.setItem("stiphans_best_score",bestScore)}
+      updateUI();
+      if(bricks.length===0 && running && !levelTransitioning){
+        completeLevel();
+        return;
+      }
+      break;
+    }
+  }
+
+  balls=balls.filter(b=>b.y<H+55);
+  if(!balls.length){
+    lives--;combo=0;updateUI();playSound(100,.16);
+    if(lives<=0){
+      running=false;
+      speedMultiplier=0.6;
+      startSpeed=0.6;
+      updateUI();
+      document.getElementById("overlay-title").textContent="GAME OVER";
+      document.getElementById("overlay-text").textContent=LANG[selectedLanguage].gameOver;
+      document.getElementById("start-btn").textContent=LANG[selectedLanguage].tryAgain;
+      document.getElementById("overlay").classList.remove("hidden");
+    }else resetBall();
+  }
+
+}
+function completeLevel(){
+  if(levelTransitioning)return;
+  levelTransitioning=true;
+  const completed=level;
+  const reward=10;
+  coins+=10;
+  saveCoins();
+  score+=completed*100;
+  playWinSound();
+  playCoinSound();
+
+  level++;
+  levelStartForBanner=level;
+  updateTheme();
+  createBricks();
+  resetBall();
+  updateUI();
+  showReward(completed,10);
+  levelTransitioning=false;
+}
+let levelStartForBanner=1;
+function showReward(completed,reward){
+  const el=document.getElementById("theme-banner");
+  el.textContent=LANG[selectedLanguage].levelComplete.replace("{n}",completed);
+  el.classList.add("show");
+  clearTimeout(themeBannerTimer);
+  themeBannerTimer=setTimeout(()=>{el.textContent=currentTheme.name+" • LEVEL "+level},1500);
+}
+function updateUI(){
+  document.getElementById("lvl-val").textContent=level;
+  document.getElementById("score-val").textContent=score;
+  document.getElementById("coins-val").textContent=coins;
+  document.getElementById("lives-val").textContent=lives;
+  document.getElementById("speed-text").textContent=speedMultiplier.toFixed(1)+"x";
+  const pct=Math.max(0,Math.min(100,(speedMultiplier-0.6)/2.4*100));
+  document.getElementById("speed-fill").style.width=pct+"%";
+  document.getElementById("shop-balance").textContent="🪙 "+coins;
+  document.querySelectorAll(".buy-btn").forEach(b=>b.disabled=coins<Number(b.dataset.cost));
+}
+
+function drawBackground(){
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#02030a");g.addColorStop(.35,currentTheme.bg1);g.addColorStop(.62,currentTheme.bg2);g.addColorStop(1,"#02030a");
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const now=performance.now()/1000;
+  ctx.globalAlpha=.16;
+  for(let i=0;i<34;i++){
+    const x=(i*97+now*(i%3+1)*8)%W,y=(i*53+(i%7)*37)%Math.max(H*.72,1);
+    ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(x,y,(i%3)+.7,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  const glow=ctx.createRadialGradient(W*.5,H*.55,10,W*.5,H*.55,Math.min(W,H)*.5);
+  glow.addColorStop(0,"rgba(255,255,255,.06)");glow.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
+}
+function drawBricks(){
+  for(const br of bricks){
+    const alpha=br.hp<br.maxHp?.76:1;
+    ctx.save();ctx.globalAlpha=alpha;
+    const g=ctx.createLinearGradient(br.x,br.y,br.x,br.y+br.h);
+    g.addColorStop(0,br.color);g.addColorStop(1,"rgba(8,10,24,.92)");
+    ctx.fillStyle=g;ctx.shadowBlur=13;ctx.shadowColor=br.color;
+    ctx.beginPath();ctx.roundRect(br.x,br.y,br.w,br.h,6);ctx.fill();
+    ctx.shadowBlur=0;ctx.strokeStyle="rgba(255,255,255,.42)";ctx.lineWidth=1;ctx.stroke();
+    ctx.font=Math.max(12,Math.min(18,br.w*.34))+"px Arial";
+    ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
+    ctx.fillText(br.item,br.x+br.w/2,br.y+br.h/2+1);
+    if(br.hp>1){
+      ctx.font="bold 9px Arial";ctx.fillStyle="#fff";ctx.fillText("×"+br.hp,br.x+br.w-9,br.y+8);
+    }
+    ctx.restore();
+  }
+}
+function drawPaddle(){
+  const px=paddle.x-paddle.w/2;
+  const g=ctx.createLinearGradient(px,0,px+paddle.w,0);
+  g.addColorStop(0,"#111827");g.addColorStop(.5,currentTheme.colors[0]);g.addColorStop(1,"#111827");
+  ctx.save();ctx.shadowBlur=18;ctx.shadowColor=currentTheme.colors[0];ctx.fillStyle=g;
+  ctx.beginPath();ctx.roundRect(px,paddle.y,paddle.w,paddle.h,9);ctx.fill();
+  ctx.shadowBlur=0;ctx.fillStyle="rgba(255,255,255,.8)";ctx.fillRect(px+8,paddle.y+5,18,4);ctx.fillRect(px+paddle.w-26,paddle.y+5,18,4);
+  ctx.font="bold 12px Segoe UI,Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
+  ctx.fillText("STIPHAN",paddle.x,paddle.y+paddle.h/2+1);ctx.restore();
+}
+function drawBall(b){
+  for(let i=0;i<b.trail.length;i++){
+    const t=b.trail[i],f=(i+1)/b.trail.length;
+    ctx.globalAlpha=f*.22;ctx.fillStyle=currentTheme.colors[0];ctx.beginPath();ctx.arc(t.x,t.y,b.r*.7*f,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=1;ctx.save();ctx.shadowBlur=22;ctx.shadowColor=currentTheme.colors[0];
+  const rg=ctx.createRadialGradient(b.x-3,b.y-4,1,b.x,b.y,b.r*1.35);
+  rg.addColorStop(0,"#fff");rg.addColorStop(.45,currentTheme.colors[1]);rg.addColorStop(1,currentTheme.colors[0]);
+  ctx.fillStyle=rg;ctx.beginPath();ctx.arc(b.x,b.y,b.r+1,0,Math.PI*2);ctx.fill();
+  if(fireStart){
+    ctx.shadowBlur=18;ctx.shadowColor="#ff5a00";
+    ctx.strokeStyle="#ff6a00";ctx.lineWidth=3;ctx.beginPath();ctx.arc(b.x,b.y,b.r+4,0,Math.PI*2);ctx.stroke();
+    ctx.font=Math.max(13,b.r*1.35)+"px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
+    ctx.fillText("🔥",b.x,b.y+1);
+  }else{
+    ctx.shadowBlur=0;ctx.font=Math.max(13,b.r*1.35)+"px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";
+    ctx.fillText(currentTheme.ball,b.x,b.y+1);
+  }
+  ctx.restore();
+}
+function render(){drawBackground();drawBricks();drawPaddle();for(const b of balls)drawBall(b)}
+
+function loop(t){
+  if(!lastTime)lastTime=t;
+  const dt=Math.min(.025,Math.max(0,(t-lastTime)/1000));lastTime=t;
+  update(dt);render();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function canvasX(clientX){
+  const r=canvas.getBoundingClientRect();
+  return (clientX-r.left)*(W/r.width);
+}
+function movePaddleTo(clientX){
+  const x=canvasX(clientX);
+  paddle.x=Math.max(paddle.w/2,Math.min(W-paddle.w/2,x));
+}
+function pointerStart(e){
+  if(e.pointerType==="mouse"&&e.button!==0)return;
+  if(running){
+    draggingPaddle=true;
+    movePaddleTo(e.clientX);
+    try{canvas.setPointerCapture(e.pointerId)}catch(_){}
+    e.preventDefault();
+  }
+}
+function pointerMove(e){
+  if(running&&draggingPaddle){movePaddleTo(e.clientX);e.preventDefault()}
+}
+function pointerEnd(e){
+  draggingPaddle=false;
+  try{canvas.releasePointerCapture(e.pointerId)}catch(_){}
+}
+canvas.addEventListener("pointerdown",pointerStart,{passive:false});
+canvas.addEventListener("pointermove",pointerMove,{passive:false});
+canvas.addEventListener("pointerup",pointerEnd,{passive:false});
+canvas.addEventListener("pointercancel",pointerEnd,{passive:false});
+canvas.addEventListener("contextmenu",e=>e.preventDefault());
+
+
+const LANG = {
+  en:{
+    langTitle:"LANGUAGE",
+    start:"PLAY & WIN", tryAgain:"TRY AGAIN",
+    intro:"Move the paddle with your finger anywhere on the game area. Break every brick and advance through themed levels. Earn exactly 10 coins for each completed level.",
+    shop:"🛒 SHOP", shopTitle:"🛒 STIPHAN SHOP",
+    shopInfo:"Coins are virtual in-game currency. They are saved on this device and are never removed by losing a life or restarting.",
+    life:"+1 Life", paddle:"Wide Paddle", fire:"Fire Ball", score:"Score Boost", close:"CLOSE",
+    pause:"Pause", resume:"Resume", levelComplete:"LEVEL {n} COMPLETE • +10 🪙",
+    gameOver:"Your earned coins are safe. Start again to replay from Level 1."
+  },
+  fr:{
+    langTitle:"LANGUE",
+    start:"JOUER & GAGNER", tryAgain:"REJOUER",
+    intro:"Déplace la raquette avec ton doigt partout sur la zone de jeu. Casse toutes les briques et avance de niveau en niveau. Gagne exactement 10 pièces pour chaque niveau terminé.",
+    shop:"🛒 BOUTIQUE", shopTitle:"🛒 BOUTIQUE STIPHAN",
+    shopInfo:"Les pièces sont une monnaie virtuelle du jeu. Elles sont sauvegardées sur cet appareil et ne sont jamais retirées après une perte de vie ou un redémarrage.",
+    life:"+1 Vie", paddle:"Raquette large", fire:"Boule de feu", score:"Bonus score", close:"FERMER",
+    pause:"Pause", resume:"Reprendre", levelComplete:"NIVEAU {n} TERMINÉ • +10 🪙",
+    gameOver:"Tes pièces gagnées sont conservées. Recommence pour rejouer depuis le niveau 1."
+  },
+  ar:{
+    langTitle:"اللغة",
+    start:"ابدأ والعب واربح", tryAgain:"حاول مرة أخرى",
+    intro:"حرّك المضرب بإصبعك في أي مكان داخل منطقة اللعب. كسّر جميع الطوب وانتقل إلى المستويات التالية. اربح 10 عملات بالضبط عند إكمال كل مستوى.",
+    shop:"🛒 المتجر", shopTitle:"🛒 متجر STIPHAN",
+    shopInfo:"العملات هي عملة افتراضية داخل اللعبة. يتم حفظها على هذا الجهاز ولا تختفي عند خسارة حياة أو إعادة اللعب.",
+    life:"+1 حياة", paddle:"مضرب عريض", fire:"كرة نارية", score:"زيادة النقاط", close:"إغلاق",
+    pause:"إيقاف", resume:"متابعة", levelComplete:"اكتمل المستوى {n} • +10 🪙",
+    gameOver:"العملات التي ربحتها محفوظة. ابدأ من جديد للعب من المستوى 1."
+  }
+};
+let selectedLanguage = localStorage.getItem("stiphans_lang") || "en";
+
+function applyLanguage(){
+  const t=LANG[selectedLanguage];
+  document.documentElement.lang=selectedLanguage;
+  document.documentElement.dir=selectedLanguage==="ar"?"rtl":"ltr";
+  const langTitle=document.querySelector(".lang-title");
+  if(langTitle) langTitle.textContent=t.langTitle;
+  document.getElementById("start-btn").textContent =
+    document.getElementById("overlay-title").textContent==="GAME OVER" ? t.tryAgain : t.start;
+  document.getElementById("overlay-text").textContent=t.intro;
+  document.getElementById("shop-btn").textContent=t.shop;
+  document.querySelector(".shop-title").textContent=t.shopTitle;
+  document.querySelector("#shop-modal p").textContent=t.shopInfo;
+  const items=document.querySelectorAll(".shop-item small");
+  if(items.length>=4){
+    items[0].textContent=t.life; items[1].textContent=t.paddle;
+    items[2].textContent=t.fire; items[3].textContent=t.score;
+  }
+  document.getElementById("close-shop").textContent=t.close;
+  document.getElementById("pause-btn").setAttribute("aria-label", paused?t.resume:t.pause);
+  document.querySelectorAll(".lang-btn").forEach(b=>b.classList.toggle("active",b.dataset.lang===selectedLanguage));
+  document.getElementById("overlay-text").dir=selectedLanguage==="ar"?"rtl":"ltr";
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    selectedLanguage=btn.dataset.lang;
+    localStorage.setItem("stiphans_lang",selectedLanguage);
+    applyLanguage();
+  });
+});
+applyLanguage();
+
+
+document.getElementById("start-btn").addEventListener("click",initGame);
+document.getElementById("pause-btn").addEventListener("click",()=>{
+  if(running){paused=!paused;document.getElementById("pause-btn").textContent=paused?"▶":"⏸";applyLanguage();lastTime=performance.now()}
+});
+document.getElementById("sub-speed").addEventListener("click",()=>{
+  speedMultiplier=Math.max(0.6,Math.round((speedMultiplier-0.1)*10)/10);updateUI()
+});
+document.getElementById("add-speed").addEventListener("click",()=>{
+  speedMultiplier=Math.min(3.0,Math.round((speedMultiplier+0.1)*10)/10);updateUI()
+});
+
+const shopModal=document.getElementById("shop-modal");
+document.getElementById("shop-btn").addEventListener("click",()=>{
+  if(running&&!paused){paused=true;document.getElementById("pause-btn").textContent="▶";applyLanguage();lastTime=performance.now();}
+  updateUI();shopModal.classList.remove("hidden");
+});
+document.getElementById("close-shop").addEventListener("click",()=>{
+  shopModal.classList.add("hidden");
+  if(running&&paused){paused=false;document.getElementById("pause-btn").textContent="⏸";applyLanguage();lastTime=performance.now();}
+});
+document.querySelectorAll(".buy-btn").forEach(btn=>btn.addEventListener("click",()=>{
+  const cost=Number(btn.dataset.cost);
+  if(coins<cost)return;
+  const item=btn.dataset.item;
+  coins-=cost;saveCoins();
+  if(item==="life")lives=Math.min(5,lives+1);
+  if(item==="paddle"){paddle.w=Math.min(220,paddle.w+28)}
+  if(item==="fire"){fireStart=true}
+  if(item==="score")scoreBoost=Math.min(2,scoreBoost+.25);
+  updateUI();playSound(720,.08,"triangle");
+}));
+
+document.addEventListener("touchmove",e=>{
+  if(running)e.preventDefault();
+},{passive:false});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden&&running){paused=true;document.getElementById("pause-btn").textContent="▶"}
+});
+
+updateTheme();updateUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://frabjous-empanada-b618a0.netlify.app/sitemap.xml

@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1800 900" fill="none">
+  <defs>
+    <linearGradient id="night" x1="140" y1="70" x2="1650" y2="850" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08090c"/>
+      <stop offset=".58" stop-color="#090a0d"/>
+      <stop offset="1" stop-color="#15100a"/>
+    </linearGradient>
+    <radialGradient id="aureole" cx="73%" cy="47%" r="62%">
+      <stop stop-color="#ffbf31" stop-opacity=".27"/>
+      <stop offset=".46" stop-color="#c57815" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#07080a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="1115" y1="180" x2="1545" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff5bf"/>
+      <stop offset=".2" stop-color="#ffda59"/>
+      <stop offset=".47" stop-color="#f6a900"/>
+      <stop offset=".72" stop-color="#fff0a0"/>
+      <stop offset="1" stop-color="#a85a00"/>
+    </linearGradient>
+    <linearGradient id="light" x1="1000" y1="760" x2="1510" y2="245" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb400" stop-opacity="0"/>
+      <stop offset=".48" stop-color="#ffdc67" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#fff1ba" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="30"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="11" result="blurred"/>
+      <feMerge>
+        <feMergeNode in="blurred"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse" patternTransform="skewY(-18)">
+      <path d="M72 0H0V72" stroke="#f7bd42" stroke-opacity=".09"/>
+      <circle cx="2" cy="2" r="1.5" fill="#ffda7c" fill-opacity=".26"/>
+    </pattern>
+    <pattern id="screen" width="9" height="9" patternUnits="userSpaceOnUse">
+      <path d="M0 0h9v1H0z" fill="#ffe5a0" fill-opacity=".09"/>
+    </pattern>
+  </defs>
+  <path fill="url(#night)" d="M0 0h1800v900H0z"/>
+  <path fill="url(#grid)" d="M0 0h1800v900H0z"/>
+  <ellipse cx="1370" cy="435" rx="590" ry="475" fill="url(#aureole)"/>
+  <path d="m930 900 440-665 430 665H930Z" fill="url(#light)"/>
+  <path d="M1050 900c150-155 320-232 510-232s360 77 520 232" stroke="#ffca4c" stroke-opacity=".24" stroke-width="2"/>
+  <path d="M1130 900c125-111 269-167 430-167 158 0 304 56 439 167" stroke="#ffca4c" stroke-opacity=".32" stroke-width="2"/>
+  <path d="M1230 900c99-70 207-105 326-105s229 35 330 105" stroke="#ffda76" stroke-opacity=".4" stroke-width="2"/>
+  <path d="M1390 94 1744 300v409l-354 204-354-204V300l354-206Z" stroke="#ffcc58" stroke-opacity=".18" stroke-width="2"/>
+  <path d="M1390 143 1701 324v360l-311 180-311-180V324l311-181Z" stroke="#ffc53d" stroke-opacity=".36" stroke-width="2"/>
+  <path d="M1390 191 1657 345v309l-267 154-267-154V345l267-154Z" fill="url(#screen)" stroke="#ffe287" stroke-opacity=".34" stroke-width="2"/>
+  <path d="M1390 182 1421 232l58-12-34 51 35 38-61-4-29 54-22-55-60 3 37-41-33-49 57 13 41-48Z" fill="url(#gold)" filter="url(#glow)"/>
+  <path d="m1190 336 63-75 62 75M1190 336l-15 76 77 31 77-31-14-76" stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round" stroke-width="15" filter="url(#glow)"/>
+  <circle cx="1176" cy="257" r="14" fill="url(#gold)" filter="url(#glow)"/>
+  <circle cx="1253" cy="250" r="13" fill="url(#gold)" filter="url(#glow)"/>
+  <circle cx="1315" cy="258" r="14" fill="url(#gold)" filter="url(#glow)"/>
+  <path d="M1496 365h-175c-38 0-61 20-61 50 0 26 18 42 55 51l108 27c41 10 60 28 60 56 0 37-32 60-83 60h-151" stroke="#ffb900" stroke-opacity=".38" stroke-linecap="round" stroke-width="55" filter="url(#blur)"/>
+  <path d="M1496 365h-175c-38 0-61 20-61 50 0 26 18 42 55 51l108 27c41 10 60 28 60 56 0 37-32 60-83 60h-151" stroke="url(#gold)" stroke-linecap="round" stroke-linejoin="round" stroke-width="23" filter="url(#glow)"/>
+  <path d="m1370 436 92 64-92 64V436Z" fill="#0b0906" stroke="#ffe383" stroke-width="8" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M1090 260h120m-60-60v120M1570 217h86m-43-43v86M1630 615h118m-59-59v118" stroke="#ffe18a" stroke-opacity=".62" stroke-width="2"/>
+  <g fill="#ffe08a" filter="url(#glow)">
+    <circle cx="1160" cy="535" r="4"/>
+    <circle cx="1590" cy="310" r="5"/>
+    <circle cx="1512" cy="694" r="3"/>
+  </g>
+</svg>

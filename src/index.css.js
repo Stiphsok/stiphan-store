@@ -1,0 +1,2 @@
+/* STIPHAN STORE static build.
+   Tailwind CSS is loaded by index.html so this module intentionally has no runtime code. */
