@@ -29,6 +29,10 @@ body {
   box-sizing: border-box;
 }
 
+#nl-badge-frame {
+  display: none !important;
+}
+
 button,
 input,
 select,
