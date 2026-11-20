@@ -103,13 +103,14 @@ function CategoryGlyph({ name }: { name: string }) {
   return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">{paths[name] || paths.games}</svg>;
 }
 
-const FEATURED_CATEGORIES = [
-  { id: "games", name: "Games", action: "Browse games", note: "Play in browser" },
-  { id: "apps", name: "Apps", action: "Explore apps", note: "Useful downloads" },
-  { id: "themes", name: "Themes", action: "View themes", note: "Make it yours" },
-  { id: "shop", name: "Shop", action: "Visit shop", note: "Store collection" },
-  { id: "favs", name: "Favorites", action: "Your picks", note: "Saved games" },
+const STIPHAN_GAMES = [
+  { id: "dama", name: "Stiphan Dama", action: "Coming Soon", note: "Board classic", image: "/category-dama.png" },
+  { id: "xo", name: "STIPHAN X&O", action: "Coming Soon", note: "Think & win", image: "/category-xo.png" },
+  { id: "mafia", name: "STIPHAN MAFIA", action: "Coming Soon", note: "Mystery & strategy", image: "/category-mafia.png" },
+  { id: "mystery", name: "STIPHAN MYSTERY", action: "Coming Soon", note: "Discover the truth", image: "/category-mystery.png" },
 ] as const;
+
+const EXTRA_STIPHAN_GAME_IDS = ["brick", "troll-platformer", "puzzle", "millionaire"] as const;
 
 
 function fileSizeLabel(size = 0) {
@@ -735,17 +736,35 @@ export default function App() {
         </div>
         </section>
 
-        <section className="featured-categories" aria-label="Featured categories">
-          <H2 title="Featured Categories" more="View All" onMore={() => setTab("games")} />
+        <section className="featured-categories" aria-label="STIPHAN games">
+          <H2 title="STIPHAN Games" more="View All" onMore={() => setTab("games")} />
           <div className="category-grid">
-            {FEATURED_CATEGORIES.map((category) => (
-              <button key={category.id} type="button" className={`category-card category-${category.id}`} onClick={() => setTab(category.id)} aria-label={`${category.name}: ${category.action}`}>
-                <span className="category-icon"><CategoryGlyph name={category.id} /></span>
-                <span className="category-name">{category.name}</span>
-                <span className="category-note">{category.note}</span>
-                <span className="category-action">{category.action}<span aria-hidden="true">→</span></span>
+            {STIPHAN_GAMES.map((game) => (
+              <button key={game.id} type="button" className={`category-card category-${game.id}`} onClick={() => setTab("games")} aria-label={`${game.name}: ${game.action}`}>
+                <img className="category-card-art" src={game.image} alt="" />
+                <span className="category-card-shade" />
+                <span className="category-name">{game.name}</span>
+                <span className="category-note">{game.note}</span>
+                <span className="category-action">{game.action}<span aria-hidden="true">→</span></span>
               </button>
             ))}
+          </div>
+
+          <H2 title="More STIPHAN Adventures" more="All Games" onMore={() => setTab("games")} />
+          <div className="category-grid extra-game-grid">
+            {EXTRA_STIPHAN_GAME_IDS.map((gameId) => {
+              const game = allGames.find((item) => item.id === gameId);
+              if (!game) return null;
+              return (
+                <button key={game.id} type="button" className="category-card category-extra" onClick={() => launchGame(game)} aria-label={`Play ${game.name}`}>
+                  {game.image && <img className="category-card-art" src={game.image} alt="" />}
+                  <span className="category-card-shade" />
+                  <span className="category-name">{game.name}</span>
+                  <span className="category-note">{game.cat}</span>
+                  <span className="category-action">Play game<span aria-hidden="true">→</span></span>
+                </button>
+              );
+            })}
           </div>
         </section>
 
